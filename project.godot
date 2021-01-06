@@ -1,0 +1,39 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=4
+
+_global_script_classes=[ {
+"base": "Object",
+"class": "Ginq",
+"language": "GDScript",
+"path": "res://script/Ginq.gd"
+}, {
+"base": "Object",
+"class": "Lambda",
+"language": "GDScript",
+"path": "res://script/Lambda/Lambda.gd"
+} ]
+_global_script_class_icons={
+"Ginq": "",
+"Lambda": ""
+}
+
+[application]
+
+config/name="Test"
+run/main_scene="res://test/test_ginq.tscn"
+config/icon="res://icon.png"
+
+[editor_plugins]
+
+enabled=PoolStringArray( "gut" )
+
+[rendering]
+
+environment/default_environment="res://default_env.tres"
