@@ -7,7 +7,7 @@ The lambda text is Python style.
 
 ```
 	var l:Ginq = Ginq.new([1,1,2,3])
-	var ret = l.filter("lambda x: x==1").val()
+	var ret = l.filter("lambda x: x==1").done()
   
 ```
 
@@ -15,7 +15,7 @@ Ginq also surpose chain calling.
 
 ```
 var l:Ginq = Ginq.new([1,1,2,3])
-var ret = l.filter("lambda x: x>1").skip(1).take(1).val()
+var ret = l.filter("lambda x: x>1").skip(1).take(1).done()
 # ret: [3]
 ```
 
