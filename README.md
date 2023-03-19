@@ -3,8 +3,6 @@ Linq for GDScript 2.0
 
 ## How to use Ginq
 
-The lambda text is Python style.
-
 ```
 	var l:Ginq = Ginq.new([1,1,2,3])
 	var ret = l.filter(func(x):return x>1).done()
