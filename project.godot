@@ -6,45 +6,18 @@
 ;   [section] ; section goes between []
 ;   param=value ; assign values to parameters
 
-config_version=4
-
-_global_script_classes=[ {
-"base": "Object",
-"class": "Ginq",
-"language": "GDScript",
-"path": "res://addons/Ginq/Ginq.gd"
-}, {
-"base": "Reference",
-"class": "GutHookScript",
-"language": "GDScript",
-"path": "res://addons/gut/hook_script.gd"
-}, {
-"base": "Node",
-"class": "GutTest",
-"language": "GDScript",
-"path": "res://addons/gut/test.gd"
-}, {
-"base": "Object",
-"class": "Lambda",
-"language": "GDScript",
-"path": "res://addons/Ginq/Lambda/Lambda.gd"
-} ]
-_global_script_class_icons={
-"Ginq": "",
-"GutHookScript": "",
-"GutTest": "",
-"Lambda": ""
-}
+config_version=5
 
 [application]
 
-config/name="Test"
-config/icon="res://icon.png"
+config/name="Ginq"
+config/features=PackedStringArray("4.0", "Forward Plus")
+config/icon="res://icon.svg"
+
+[dotnet]
+
+project/assembly_name="Ginq"
 
 [editor_plugins]
 
-enabled=PoolStringArray( "res://addons/Ginq/plugin.cfg", "res://addons/gut/plugin.cfg" )
-
-[mono]
-
-project/assembly_name="Test"
+enabled=PackedStringArray("res://addons/gut/plugin.cfg")

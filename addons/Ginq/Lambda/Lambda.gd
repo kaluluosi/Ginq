@@ -21,7 +21,7 @@ func invoke(args:Array):
 		var script = GDScript.new()
 		script.set_source_code(lambda_code)
 		script.reload()
-		var obj = Reference.new()
+		var obj = RefCounted.new()
 		obj.set_script(script)
 		var ret = obj.callv(lambda_name, args)
 		return ret

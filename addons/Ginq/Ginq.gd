@@ -1,12 +1,12 @@
 extends Object
 class_name Ginq
 
-var array: Array setget ,getArray
+var array: Array : get = getArray
 var _operators = []
 var _lambdas = []
 var host:Object
 
-func _init(iterable: Array, operators:=[], lambdas:=[]):
+func _init(iterable: Array,operators:=[],lambdas:=[]):
 	array = iterable.duplicate(true)
 	_operators = operators
 	_lambdas = lambdas
@@ -38,7 +38,7 @@ static func eval(code:String):
 	var script = GDScript.new()
 	script.set_source_code("func eval():\n\treturn "+code)
 	script.reload()
-	var obj = Reference.new()
+	var obj = RefCounted.new()
 	obj.set_script(script)
 	var ret = obj.eval()
 	return ret
@@ -63,12 +63,12 @@ func add_lambda(code:String) -> String:
 		return 'error'
 
 func _init_lambda_host():
-	var lambda_codes = PoolStringArray(_lambdas).join('\n')
+	var lambda_codes = '\n'.join(PackedStringArray(_lambdas))
 
 	var script = GDScript.new()
 	script.set_source_code(lambda_codes)
 	script.reload()
-	var hostObj = Reference.new()
+	var hostObj = RefCounted.new()
 	hostObj.set_script(script)
 	host = hostObj
 	
@@ -137,7 +137,7 @@ func skip(num:int) -> Ginq:
 func _skip(args, iterable: Array):
 	var num = args.num
 	var skipnum = num if num - 1 > 0 else 0
-	return iterable.slice(skipnum, len(iterable)-1)
+	return iterable.slice(skipnum)
 
 func skip_while(lambda:String) -> Ginq:
 	var clone = _clone()
@@ -154,7 +154,7 @@ func _skip_while(args, iterable:Array) -> Array:
 				start_index+=1
 			else:
 				break
-		return iterable.slice(start_index, len(iterable)-1)
+		return iterable.slice(start_index)
 	else:
 		push_error("lambda not found")
 		return []
@@ -171,7 +171,7 @@ func _take(args, iterable:Array) -> Array:
 	elif num > len(iterable):
 		return iterable
 	else:
-		return iterable.slice(0, num-1)
+		return iterable.slice(0, num)
 		
 func take_while(lambda:String):
 	var clone = _clone()
@@ -180,7 +180,7 @@ func take_while(lambda:String):
 	return clone
 
 func _take_while(args, iterable:Array) -> Array:
-	var end_index = -1
+	var end_index = 0
 	var lambda_name = args.lambda_name
 	if host.has_method(lambda_name):
 		for index in len(iterable):
@@ -339,7 +339,7 @@ func _expect(args, iterable:Array) -> Array:
 	for v in iterable:
 		if v in ret:
 			var index = ret.find(v)
-			ret.remove(index)
+			ret.remove_at(index)
 			continue
 		else:
 			ret.push_back(v)
@@ -368,7 +368,7 @@ func sum(lambda:String="lambda x:x"):
 	var temp_array = map(lambda).done()
 	var ret = 0
 	for value in temp_array:
-		if typeof(value) in [TYPE_INT,TYPE_REAL]:
+		if typeof(value) in [TYPE_INT,TYPE_FLOAT]:
 			ret += value
 		else:
 			push_error('{} is not number'.format({0:value}))
@@ -413,13 +413,13 @@ const MODULO_8_BIT = 256
 
 static func getRandomInt():
   # Randomize every time to minimize the risk of collisions
-  randomize()
+	randomize()
 
-  return randi() % MODULO_8_BIT
+	return randi() % MODULO_8_BIT
 
 static func uuidbin():
   # 16 random bytes with the bytes on index 6 and 8 modified
-  return [
+	return [
 	getRandomInt(), getRandomInt(), getRandomInt(), getRandomInt(),
 	getRandomInt(), getRandomInt(), ((getRandomInt()) & 0x0f) | 0x40, getRandomInt(),
 	((getRandomInt()) & 0x3f) | 0x80, getRandomInt(), getRandomInt(), getRandomInt(),
@@ -428,9 +428,9 @@ static func uuidbin():
 
 static func v4(delimiter='-'):
   # 16 random bytes with the bytes on index 6 and 8 modified
-  var b = uuidbin()
+	var b = uuidbin()
 
-  return ('%02x%02x%02x%02x{delimiter}%02x%02x{delimiter}%02x%02x{delimiter}%02x%02x{delimiter}%02x%02x%02x%02x%02x%02x' % [
+	return ('%02x%02x%02x%02x{delimiter}%02x%02x{delimiter}%02x%02x{delimiter}%02x%02x{delimiter}%02x%02x%02x%02x%02x%02x' % [
 	# low
 	b[0], b[1], b[2], b[3],
 
