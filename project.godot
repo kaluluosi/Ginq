@@ -12,28 +12,39 @@ _global_script_classes=[ {
 "base": "Object",
 "class": "Ginq",
 "language": "GDScript",
-"path": "res://script/Ginq.gd"
+"path": "res://addons/Ginq/Ginq.gd"
+}, {
+"base": "Reference",
+"class": "GutHookScript",
+"language": "GDScript",
+"path": "res://addons/gut/hook_script.gd"
+}, {
+"base": "Node",
+"class": "GutTest",
+"language": "GDScript",
+"path": "res://addons/gut/test.gd"
 }, {
 "base": "Object",
 "class": "Lambda",
 "language": "GDScript",
-"path": "res://script/Lambda/Lambda.gd"
+"path": "res://addons/Ginq/Lambda/Lambda.gd"
 } ]
 _global_script_class_icons={
 "Ginq": "",
+"GutHookScript": "",
+"GutTest": "",
 "Lambda": ""
 }
 
 [application]
 
 config/name="Test"
-run/main_scene="res://test/test_ginq.tscn"
 config/icon="res://icon.png"
 
 [editor_plugins]
 
-enabled=PoolStringArray( "gut" )
+enabled=PoolStringArray( "res://addons/Ginq/plugin.cfg", "res://addons/gut/plugin.cfg" )
 
-[rendering]
+[mono]
 
-environment/default_environment="res://default_env.tres"
+project/assembly_name="Test"

@@ -1,15 +1,14 @@
-extends "res://addons/gut/test.gd"
-
-var L = load('res://script/Ginq.gd')
+extends GutTest
+var L = Ginq
 
 func test_filter():
 	var l:Ginq = L.new([1,1,2,3])
-	var ret = l.filter("lambda x: x==1").val()
+	var ret = l.filter("lambda x: x==1").done()
 	assert_eq(ret, [1,1], 'not match')
 
 func test_map():
 	var l:Ginq = L.new([1,1,2,3])
-	var ret = l.map("lambda x:x*2").val()
+	var ret = l.map("lambda x:x*2").done()
 	assert_eq(ret, [2,2,4,6], 'not match')
 
 func _skip_params():
@@ -27,7 +26,7 @@ func _skip_params():
 
 func test_skip(params=use_parameters(_skip_params())):
 	var l:Ginq = L.new(params.array)
-	var ret = l.skip(params.skip).val()
+	var ret = l.skip(params.skip).done()
 	assert_eq(ret, params.expect, 'not match')
 
 func _skip_while_params():
@@ -42,7 +41,7 @@ func _skip_while_params():
 
 func test_skip_while(params=use_parameters(_skip_while_params())):
 	var l:Ginq = L.new(params.array)
-	var ret = l.skip_while(params.lambda).val()
+	var ret = l.skip_while(params.lambda).done()
 	assert_eq(ret, params.expect, 'not match')
 
 
@@ -60,7 +59,7 @@ func _take_params():
 
 func test_take(params=use_parameters(_take_params())):
 	var l:Ginq = L.new(params.array)
-	var ret = l.take(params.take).val()
+	var ret = l.take(params.take).done()
 	assert_eq(ret, params.expect, 'not match')
 
 
@@ -78,7 +77,7 @@ func _take_while_params():
 
 func test_take_while(params=use_parameters(_take_while_params())):
 	var l:Ginq = L.new(params.array)
-	var ret = l.take_while(params.lambda).val()
+	var ret = l.take_while(params.lambda).done()
 	assert_eq(ret, params.expect, 'not match')
 
 
@@ -91,12 +90,12 @@ func test_join():
 	]
 
 	var left_ginq:Ginq = L.new(left)
-	var ret = left_ginq.join(right, "lambda x:x.id", "lambda y:y.id").val()
+	var ret = left_ginq.join(right, "lambda x:x.id", "lambda y:y.id").done()
 
 	assert_eq(ret[0][0].id, ret[0][1].id, 'not match')
 	assert_eq(ret[1][0].id, ret[1][1].id, 'not match')
 
-	ret = left_ginq.join(right, "lambda x:x.id", "lambda y:y.id").select("lambda pair: {id=pair[0].id, name=pair[0].name, age=pair[1].age}").val()
+	ret = left_ginq.join(right, "lambda x:x.id", "lambda y:y.id").select("lambda pair: {id=pair[0].id, name=pair[0].name, age=pair[1].age}").done()
 	assert_eq(ret[0].id,1, 'not match')
 	assert_eq(ret[0].name,'a', 'not match')
 	assert_eq(ret[0].age,1, 'not match')
@@ -107,14 +106,14 @@ func test_concate():
 	var right = [4,5,6]
 
 	var left_ginq = L.new(left)
-	var ret = left_ginq.concate(right).val()
+	var ret = left_ginq.concate(right).done()
 	assert_eq(ret, [1,2,3,4,5,6], 'not match')
 
 
 func test_order():
 	var unorder = [2,3,1,4,5]
 	var order_ginq = L.new(unorder)
-	var ret = order_ginq.order_by().val()
+	var ret = order_ginq.order_by().done()
 	assert_eq(ret, [1,2,3,4,5], 'not match')
 
 func test_order_by_lambda():
@@ -126,18 +125,18 @@ func test_order_by_lambda():
 	]
 
 	var order_obj_list = L.new(unorder_obj_list)
-	var ordered_obj_list = order_obj_list.order_by("lambda x:x.name").val()
-	var name_list = L.new(ordered_obj_list).map("lambda x:x.name").val()
+	var ordered_obj_list = order_obj_list.order_by("lambda x:x.name").done()
+	var name_list = L.new(ordered_obj_list).map("lambda x:x.name").done()
 	assert_eq(name_list, ['a','b','c','d'], 'not match')
 
-	ordered_obj_list = order_obj_list.order_by("lambda x:x.id").val()
-	var id_list = L.new(ordered_obj_list).map("lambda x:x.id").val()
+	ordered_obj_list = order_obj_list.order_by("lambda x:x.id").done()
+	var id_list = L.new(ordered_obj_list).map("lambda x:x.id").done()
 	assert_eq(id_list, [1,2,3,4], "not match")
 	
 func test_order_descending():
 	var unorder = [2,3,1,4,5]
 	var order_ginq = L.new(unorder)
-	var ret = order_ginq.order_by_descending().val()
+	var ret = order_ginq.order_by_descending().done()
 	assert_eq(ret, [5,4,3,2,1], 'not match')
 
 func test_order_by_lambda_descending():
@@ -149,22 +148,22 @@ func test_order_by_lambda_descending():
 	]
 
 	var order_obj_list = L.new(unorder_obj_list)
-	var ordered_obj_list = order_obj_list.order_by_descending("lambda x:x.name").val()
-	var name_list = L.new(ordered_obj_list).map("lambda x:x.name").val()
+	var ordered_obj_list = order_obj_list.order_by_descending("lambda x:x.name").done()
+	var name_list = L.new(ordered_obj_list).map("lambda x:x.name").done()
 	assert_eq(name_list, ['d','c','b','a'], 'not match')
 
-	ordered_obj_list = order_obj_list.order_by_descending("lambda x:x.id").val()
-	var id_list = L.new(ordered_obj_list).map("lambda x:x.id").val()
+	ordered_obj_list = order_obj_list.order_by_descending("lambda x:x.id").done()
+	var id_list = L.new(ordered_obj_list).map("lambda x:x.id").done()
 	assert_eq(id_list, [4,3,2,1], "not match")
 	
 func test_reverse():
 	var array = [1,2,3,4,5]
-	var ret = L.new(array).reverse().val()
+	var ret = L.new(array).reverse().done()
 	assert_eq(ret, [5,4,3,2,1],'not match')
 
 func test_distinct():
 	var array = [1,2,3,3,4,5,6,5]
-	var ret = L.new(array).distinct().val()
+	var ret = L.new(array).distinct().done()
 	assert_eq(ret, [1,2,3,4,5,6], 'not match')
 
 
@@ -173,7 +172,7 @@ func test_union():
 	var right = [3,4,5]
 
 	var left_ginq = L.new(left)
-	var ret = left_ginq.union(right).val()
+	var ret = left_ginq.union(right).done()
 	assert_eq(ret, [1,2,3,4,5], 'not match')
 
 func test_intersect():
@@ -181,7 +180,7 @@ func test_intersect():
 	var right = [3,4,5]
 
 	var left_ginq = L.new(left)
-	var ret = left_ginq.intersect(right).val()
+	var ret = left_ginq.intersect(right).done()
 	assert_eq(ret, [3], 'not match')
 
 func test_expect():
@@ -189,7 +188,7 @@ func test_expect():
 	var right = [3,4,5]
 
 	var left_ginq = L.new(left)
-	var ret = left_ginq.expect(right).val()
+	var ret = left_ginq.expect(right).done()
 	assert_eq(ret, [1,2,4,5], 'not match')
 
 

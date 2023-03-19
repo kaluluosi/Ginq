@@ -14,7 +14,7 @@ func _init(iterable: Array, operators:=[], lambdas:=[]):
 func getArray():
 	return array
 	
-func val():
+func done():
 	_init_lambda_host() 
 	
 	var tempValue = array
@@ -74,13 +74,19 @@ func _init_lambda_host():
 	
 func register_operator(method:String, args):
 	_operators.append({method=method, args=args})
-		
+
+# endregion
+
+# region operator define
+
+# 链式操作中不会直接调用处理而是将操作信息注册到操作链里
 func filter(lambda: String) -> Ginq:
 	var clone = _clone()
 	var lambda_name = clone.add_lambda(lambda)
 	clone.register_operator('_filter', {lambda_name=lambda_name})
 	return clone
 
+# 这才是filter操作的具体的处理函数
 func _filter(args, iterable: Array) -> Array:
 	var ret:Array = []
 	var lambda_name = args.lambda_name
@@ -307,7 +313,7 @@ func union(secendIterable:Array) -> Ginq:
 	return clone
 
 func _union(args, iterable:Array) -> Array:
-	var ret = _new_ginq(iterable).concate(args.secendIterable).distinct().val()
+	var ret = _new_ginq(iterable).concate(args.secendIterable).distinct().done()
 	return ret
 
 func intersect(secendIterable:Array) -> Ginq:
@@ -329,7 +335,7 @@ func expect(secendIterable:Array) -> Ginq:
 
 func _expect(args, iterable:Array) -> Array:
 	var ret = []
-	iterable = _new_ginq(iterable).concate(args.secendIterable).val()
+	iterable = _new_ginq(iterable).concate(args.secendIterable).done()
 	for v in iterable:
 		if v in ret:
 			var index = ret.find(v)
@@ -341,7 +347,7 @@ func _expect(args, iterable:Array) -> Array:
 	return ret
 
 func all(lambda:String="lambda x:x") -> bool:
-	var temp_array = map(lambda).val()
+	var temp_array = map(lambda).done()
 	var ret = true
 	for value in temp_array:
 		ret = ret and value
@@ -350,7 +356,7 @@ func all(lambda:String="lambda x:x") -> bool:
 	return true
 
 func any(lambda: String="lambda x:x") -> bool:
-	var temp_array = map(lambda).val()
+	var temp_array = map(lambda).done()
 	var ret = false
 	for value in temp_array:
 		ret = ret or value
@@ -359,7 +365,7 @@ func any(lambda: String="lambda x:x") -> bool:
 	return false
 
 func sum(lambda:String="lambda x:x"):
-	var temp_array = map(lambda).val()
+	var temp_array = map(lambda).done()
 	var ret = 0
 	for value in temp_array:
 		if typeof(value) in [TYPE_INT,TYPE_REAL]:
@@ -371,7 +377,7 @@ func sum(lambda:String="lambda x:x"):
 	return ret
 
 func min(lambda:String="lambda x:x"):
-	var temp_array = map(lambda).val()
+	var temp_array = map(lambda).done()
 	
 	var min_value = temp_array.pop_front()
 	for value in temp_array:
@@ -381,7 +387,7 @@ func min(lambda:String="lambda x:x"):
 	return min_value
 
 func max(lambda:String="lambda x:x"):
-	var temp_array = map(lambda).val()
+	var temp_array = map(lambda).done()
 
 	var max_value = temp_array.pop_front()
 	for value in temp_array:
@@ -391,7 +397,7 @@ func max(lambda:String="lambda x:x"):
 	return max_value
 
 func average(lambda:String="lambda x:x"):
-	var temp_array = map(lambda).val()
+	var temp_array = map(lambda).done()
 	var tempGinq = _new_ginq(temp_array)
 	var sum = tempGinq.sum()
 	return sum/len(temp_array)
