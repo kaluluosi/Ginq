@@ -1,4 +1,4 @@
-# Ginq_Lambda
+# Ginq
 Linq for GDScript and Lambda wrapper
 
 ## How to use Ginq
