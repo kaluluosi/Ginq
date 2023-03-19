@@ -3,9 +3,10 @@
 
 # Ignore some files when exporting to a ZIP.
 # Only include the addons folder when downloading from the Asset Library.
-/addons    !export-ignore
-/addons/Ginq/** !export-ignore
-
 /**        export-ignore
+
+/addons    !export-ignore
+/addons/Ginq !export-ignore
+
 /addons/gut export-ignore
 /addons/Ginq/tests export-ignore
