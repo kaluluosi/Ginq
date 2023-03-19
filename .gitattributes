@@ -6,6 +6,6 @@
 /**        export-ignore
 
 /addons    !export-ignore
-/addons/Ginq/** !export-ignore
+/addons/** !export-ignore
 
 /addons/gut export-ignore
