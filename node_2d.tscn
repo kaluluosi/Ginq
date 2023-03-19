@@ -1,0 +1,16 @@
+[gd_scene load_steps=2 format=3 uid="uid://cyj4n5eql0ers"]
+
+[sub_resource type="GDScript" id="GDScript_l82yp"]
+script/source = "extends Node2D
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	var a= [1,2,3]
+	var q = Ginq.new(a)
+	var ret = q.filter(func(x):return x>1).map(func(x):return x*2).done()
+	print(ret)
+"
+
+[node name="Node2D" type="Node2D"]
+script = SubResource("GDScript_l82yp")

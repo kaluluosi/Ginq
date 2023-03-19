@@ -3,12 +3,12 @@ var L = Ginq
 
 func test_filter():
 	var l:Ginq = L.new([1,1,2,3])
-	var ret = l.filter("lambda x: x==1").done()
+	var ret = l.filter(func(x): return x==1).done()
 	assert_eq(ret, [1,1], 'not match')
 
 func test_map():
 	var l:Ginq = L.new([1,1,2,3])
-	var ret = l.map("lambda x:x*2").done()
+	var ret = l.map(func(x): return x*2).done()
 	assert_eq(ret, [2,2,4,6], 'not match')
 
 func _skip_params():
@@ -33,8 +33,8 @@ func _skip_while_params():
 	var params = [
 		['array', 'lambda', 'expect'],
 		[
-			[[1,1,2,3], "lambda x:x<2", [2,3]],
-			[[1,1,2,3], "lambda x:x>2", [1,1,2,3]],
+			[[1,1,2,3], func(x):return x<2, [2,3]],
+			[[1,1,2,3], func(x):return x>2, [1,1,2,3]],
 		]
 	]
 	return ParameterFactory.named_parameters(params[0], params[1])
@@ -67,9 +67,9 @@ func _take_while_params():
 	var params = [
 		['array', 'lambda', 'expect'],
 		[
-			[[1,1,2,3], 'lambda x:x<2', [1,1]],
-			[[1,1,2,3], 'lambda x:x>2', []],
-			[[1,1,2,3], 'lambda x:x>0', [1,1,2,3]],
+			[[1,1,2,3], func(x):return x<2 , [1,1]],
+			[[1,1,2,3], func(x):return x>2, []],
+			[[1,1,2,3], func(x):return x>0, [1,1,2,3]],
 		]
 	]
 
@@ -90,12 +90,11 @@ func test_join():
 	]
 
 	var left_ginq:Ginq = L.new(left)
-	var ret = left_ginq.join(right, "lambda x:x.id", "lambda y:y.id").done()
+	var ret = left_ginq.join(right, func(x): return x.id, func(y): return y.id).done()
 
 	assert_eq(ret[0][0].id, ret[0][1].id, 'not match')
 	assert_eq(ret[1][0].id, ret[1][1].id, 'not match')
-
-	ret = left_ginq.join(right, "lambda x:x.id", "lambda y:y.id").select("lambda pair: {id=pair[0].id, name=pair[0].name, age=pair[1].age}").done()
+	ret = left_ginq.join(right, func(x): return  x.id, func(y): return y.id).select(func(pair): return {id=pair[0].id, name=pair[0].name, age=pair[1].age}).done()
 	assert_eq(ret[0].id,1, 'not match')
 	assert_eq(ret[0].name,'a', 'not match')
 	assert_eq(ret[0].age,1, 'not match')
@@ -125,12 +124,12 @@ func test_order_by_lambda():
 	]
 
 	var order_obj_list = L.new(unorder_obj_list)
-	var ordered_obj_list = order_obj_list.order_by("lambda x:x.name").done()
-	var name_list = L.new(ordered_obj_list).map("lambda x:x.name").done()
+	var ordered_obj_list = order_obj_list.order_by(func(x): return x.name).done()
+	var name_list = L.new(ordered_obj_list).map(func(x): return x.name).done()
 	assert_eq(name_list, ['a','b','c','d'], 'not match')
 
-	ordered_obj_list = order_obj_list.order_by("lambda x:x.id").done()
-	var id_list = L.new(ordered_obj_list).map("lambda x:x.id").done()
+	ordered_obj_list = order_obj_list.order_by(func(x): return x.id).done()
+	var id_list = L.new(ordered_obj_list).map(func(x): return x.id).done()
 	assert_eq(id_list, [1,2,3,4], "not match")
 	
 func test_order_descending():
@@ -148,12 +147,12 @@ func test_order_by_lambda_descending():
 	]
 
 	var order_obj_list = L.new(unorder_obj_list)
-	var ordered_obj_list = order_obj_list.order_by_descending("lambda x:x.name").done()
-	var name_list = L.new(ordered_obj_list).map("lambda x:x.name").done()
+	var ordered_obj_list = order_obj_list.order_by_descending(func(x): return x.name).done()
+	var name_list = L.new(ordered_obj_list).map(func(x): return x.name).done()
 	assert_eq(name_list, ['d','c','b','a'], 'not match')
 
-	ordered_obj_list = order_obj_list.order_by_descending("lambda x:x.id").done()
-	var id_list = L.new(ordered_obj_list).map("lambda x:x.id").done()
+	ordered_obj_list = order_obj_list.order_by_descending(func(x): return x.id).done()
+	var id_list = L.new(ordered_obj_list).map(func(x): return x.id).done()
 	assert_eq(id_list, [4,3,2,1], "not match")
 	
 func test_reverse():
@@ -217,7 +216,7 @@ func test_all():
 		]
 	ginq = L.new(array)
 
-	ret = ginq.all("lambda x: x.name")
+	ret = ginq.all(func(x): return x.name)
 	assert_eq(ret, false, 'not match')
 
 func test_any():
@@ -245,7 +244,7 @@ func test_any():
 		]
 	ginq = L.new(array)
 
-	ret = ginq.any("lambda x: x.name")
+	ret = ginq.any(func(x): return x.name)
 	assert_eq(ret, true, 'not match')
 
 func test_sum():
@@ -264,7 +263,7 @@ func test_sum():
 	]
 
 	ginq = L.new(array)
-	ret = ginq.sum("lambda x:x.age")
+	ret = ginq.sum(func(x): return x.age)
 	assert_eq(ret, 3)
 
 func test_min():
@@ -283,7 +282,7 @@ func test_min():
 	]
 
 	ginq = L.new(array)
-	ret = ginq.min("lambda x:x.age")
+	ret = ginq.min(func(x): return x.age)
 	assert_eq(ret, 1)
 
 
@@ -303,7 +302,7 @@ func test_max():
 	]
 
 	ginq = L.new(array)
-	ret = ginq.max("lambda x:x.age")
+	ret = ginq.max(func(x): return x.age)
 	assert_eq(ret, 2)
 
 func test_average():
@@ -325,5 +324,5 @@ func test_average():
 	]
 
 	ginq = L.new(array)
-	ret = ginq.average("lambda x:x.age")
+	ret = ginq.average(func(x): return x.age)
 	assert_eq(ret, 2)
