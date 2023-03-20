@@ -94,7 +94,10 @@ func test_join():
 
 	assert_eq(ret[0][0].id, ret[0][1].id, 'not match')
 	assert_eq(ret[1][0].id, ret[1][1].id, 'not match')
-	ret = left_ginq.join(right, func(x): return  x.id, func(y): return y.id).select(func(pair): return {id=pair[0].id, name=pair[0].name, age=pair[1].age}).done()
+	ret = left_ginq\
+			.join(right, func(x): return  x.id, func(y): return y.id)\
+			.select(func(pair): return {id=pair[0].id, name=pair[0].name, age=pair[1].age})\
+			.done()
 	assert_eq(ret[0].id,1, 'not match')
 	assert_eq(ret[0].name,'a', 'not match')
 	assert_eq(ret[0].age,1, 'not match')
