@@ -10,10 +10,14 @@ var array: Array :
 
 ## 操作链
 var _operators = []
+var _clone_mode:bool
 
-func _init(iterable: Array,operators:=[],lambdas:=[]):
+## 构造函数
+## iterable: Array 要包裹的数组
+func _init(iterable:Array,operators:=[],clone:=false):
 	array = iterable.duplicate(true)
 	_operators = operators
+	_clone_mode = clone
 	
 ## 原始数组的getter
 func getArray():
@@ -31,9 +35,15 @@ static func eval(code:String):
 	return ret
 
 # 注册操作
-func _register_operator(method:String, args):
-	_operators.append({method=method, args=args})
-
+func _register_operator(method:String, args) ->Ginq:
+	var ginq = _clone()
+	ginq._operators.append({method=method, args=args})
+	return ginq
+	
+func _clone():
+	if _clone_mode:
+		return Ginq.new(array,_operators.duplicate(true),_clone_mode)
+	return self
 
 # region operator define
 
@@ -58,8 +68,7 @@ func done()->Array:
 ## lambda:Callable[[any],bool] 过滤条件[br]
 func filter(lambda: Callable) -> Ginq:
 	# 链式操作中不会直接调用处理而是将操作信息注册到操作链里[br]
-	self._register_operator('_filter', {lambda=lambda})
-	return self
+	return _register_operator('_filter', {lambda=lambda})
 
 func _filter(args, iterable: Array) -> Array:
 	# 这才是filter操作的具体的处理函数
@@ -84,8 +93,7 @@ func where(lambda:Callable) -> Ginq:
 ## 等同python的map，为每个元素应用lambda[br]
 ## lambda:Callable[[any],any]
 func map(lambda:Callable) -> Ginq:
-	self._register_operator('_map', {lambda=lambda})
-	return self
+	return _register_operator('_map', {lambda=lambda})
 	
 func _map(args, iterable:Array) -> Array:
 	var ret:Array = []
@@ -109,8 +117,7 @@ func select(lambda:Callable) -> Ginq:
 ## 跳过头num个元素，返回后面的元素的数组[br]
 ## num:int 跳过数量
 func skip(num:int) -> Ginq:
-	self._register_operator('_skip', {num=num})
-	return self
+	return _register_operator('_skip', {num=num})
 	
 func _skip(args, iterable: Array):
 	var num = args.num
@@ -126,8 +133,7 @@ func _skip(args, iterable: Array):
 ## # 当遇到4的时候条件满足，在这里截断取剩下的子数组。
 ## [/codeblock]
 func skip_while(lambda:Callable) -> Ginq:
-	self._register_operator('_skip_while',{lambda=lambda})
-	return self
+	return _register_operator('_skip_while',{lambda=lambda})
 
 func _skip_while(args, iterable:Array) -> Array:
 	var start_index = 0
@@ -146,8 +152,7 @@ func _skip_while(args, iterable:Array) -> Array:
 ## 取头num个元素返回数组[br]
 ## num:int 取头数量[br]
 func take(num:int) -> Ginq:
-	self._register_operator('_take', {num=num})
-	return self
+	return _register_operator('_take', {num=num})
 	
 func _take(args, iterable:Array) -> Array:
 	var num = args.num
@@ -167,8 +172,7 @@ func _take(args, iterable:Array) -> Array:
 ## # 当遇到4的时候条件满足，在这里截断取剩下的子数组。
 ## [/codeblock]
 func take_while(lambda:Callable):
-	self._register_operator('_take_while', {lambda=lambda})
-	return self
+	return _register_operator('_take_while', {lambda=lambda})
 
 func _take_while(args, iterable:Array) -> Array:
 	var end_index = 0
@@ -195,8 +199,7 @@ func _take_while(args, iterable:Array) -> Array:
 func join(secendIterable:Array, lambda_source_key:Callable, lambda_inner_key:Callable) -> Ginq:
 	var lambda_source_key_name = lambda_source_key
 	var lambda_inner_key_name = lambda_inner_key
-	self._register_operator('_join', {lambda_source_key_name=lambda_source_key_name, lambda_inner_key_name=lambda_inner_key_name, secendIterable=secendIterable})
-	return self
+	return _register_operator('_join', {lambda_source_key_name=lambda_source_key_name, lambda_inner_key_name=lambda_inner_key_name, secendIterable=secendIterable})
 
 func _join(args, iterable:Array) -> Array:
 	var ret = []
@@ -215,8 +218,7 @@ func _join(args, iterable:Array) -> Array:
 ## 连接两个数组[br]
 ## 就是发两个数组合并成一个数组[br]
 func concate(iterable:Array) -> Ginq:
-	self._register_operator('_concate', {iterable=iterable})
-	return self
+	return _register_operator('_concate', {iterable=iterable})
 
 func _concate(args, iterable:Array) -> Array:
 	var target_iterable:Array = args.iterable
@@ -229,8 +231,7 @@ func _concate(args, iterable:Array) -> Array:
 ## lambda:Callable[[any],any] 每个元素要对比的值[br]
 ## comparer:Callable[[any,any],bool] 自定义对比器，不设置就默认sort[br]
 func order_by(lambda:Callable = func(x): return x, comparer=null) -> Ginq:
-	self._register_operator('_order_by', {lambda=lambda, comparer=comparer})
-	return self
+	return _register_operator('_order_by', {lambda=lambda, comparer=comparer})
 
 func _order_by(args, iterable:Array) -> Array:
 	var lambda = args.lambda
@@ -262,8 +263,7 @@ func _order_by(args, iterable:Array) -> Array:
 ## lambda:Callable[[any],any] 每个元素要对比的值[br]
 ## comparer:Callable[[any,any],bool] 自定义对比器，不设置就默认sort[br]
 func order_by_descending(lambda:Callable=func(x): return x,comparer=null) -> Ginq:
-	self._register_operator('_order_by_descending', {lambda=lambda,comparer=comparer})
-	return self
+	return _register_operator('_order_by_descending', {lambda=lambda,comparer=comparer})
 
 func _order_by_descending(args, iterable:Array) -> Array:
 	var lambda = args.lambda
@@ -296,8 +296,7 @@ func _order_by_descending(args, iterable:Array) -> Array:
 
 ## 翻转，将数组倒转
 func reverse() -> Ginq:
-	self._register_operator('_reverse', null)
-	return self
+	return _register_operator('_reverse', null)
 
 func _reverse(args, iterable:Array) -> Array:
 	var ret = []
@@ -307,8 +306,7 @@ func _reverse(args, iterable:Array) -> Array:
 
 ## 去重
 func distinct() -> Ginq:
-	self._register_operator('_distinct', {})
-	return self
+	return _register_operator('_distinct', {})
 
 func _distinct(args, iterable:Array) -> Array:
 	var ret = []
@@ -322,8 +320,7 @@ func _distinct(args, iterable:Array) -> Array:
 ## 合集操作[br]
 ## 把两个数组合并并且取出重复取合集[br]
 func union(secendIterable:Array) -> Ginq:
-	self._register_operator('_union', {secendIterable=secendIterable})
-	return self
+	return _register_operator('_union', {secendIterable=secendIterable})
 
 func _union(args, iterable:Array) -> Array:
 	# 因为利用了Ginq来做合集操作，所以需要用新的Ginq对象
@@ -333,8 +330,7 @@ func _union(args, iterable:Array) -> Array:
 ## 交集操作[br]
 ## 把两个数组相同元素抽取出来返回数组[br]
 func intersect(secendIterable:Array) -> Ginq:
-	self._register_operator('_intersect', {secendIterable=secendIterable})
-	return self
+	return _register_operator('_intersect', {secendIterable=secendIterable})
 
 func _intersect(args, iterable:Array) -> Array:
 	var ret = []
@@ -346,8 +342,7 @@ func _intersect(args, iterable:Array) -> Array:
 ## 异或操作[br]
 ## 将两个数组不同部分抽取出来返回数组[br]
 func expect(secendIterable:Array) -> Ginq:
-	self._register_operator('_expect', {secendIterable=secendIterable})
-	return self	
+	return _register_operator('_expect', {secendIterable=secendIterable})
 
 func _expect(args, iterable:Array) -> Array:
 	var ret = []
